@@ -1,0 +1,38 @@
+#include <SoftwareSerial.h>
+
+#define LDR_PIN A0
+#define PIR_PIN 7
+#define LED_PIN 8
+
+SoftwareSerial esp(2, 3); // RX, TX for ESP8266
+
+void setup() {
+  Serial.begin(9600);
+  esp.begin(9600);
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.println("Smart Street Light Started");
+}
+
+void loop() {
+  int ldrValue = analogRead(LDR_PIN);
+  int pirValue = digitalRead(PIR_PIN);
+
+  if (ldrValue > 500) { // Night time
+    if (pirValue == HIGH) {
+      digitalWrite(LED_PIN, HIGH);
+      Serial.println("Motion Detected - Light ON");
+      esp.println("Motion Detected - Light ON");
+    } else {
+      digitalWrite(LED_PIN, LOW);
+      Serial.println("No Motion - Light OFF");
+      esp.println("No Motion - Light OFF");
+    }
+  } else { // Day time
+    digitalWrite(LED_PIN, LOW);
+    Serial.println("Daytime - Light OFF");
+    esp.println("Daytime - Light OFF");
+  }
+
+  delay(1000);
+}
